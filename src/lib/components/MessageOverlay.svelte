@@ -72,4 +72,26 @@ function onStartButtonMousedown(event: MouseEvent) {
 			</button>
 		</div>
 	</div>
+
+	<!-- credits + about -->
+	{#if game.status === "ready" || game.status === "paused"}
+		<footer
+			class="absolute bottom-6 w-full text-center text-sm text-white/70"
+		>
+			<p>
+				Made by Kevin Peckham @
+				<a
+					class="underline transition-colors hover:text-white"
+					href="https://www.lightningjar.com">Lightning Jar</a
+				>
+				in Philadelphia.
+			</p>
+			<p class="mt-2">
+				<a
+					class="underline transition-colors hover:text-white"
+					href="/about">About this game</a
+				>
+			</p>
+		</footer>
+	{/if}
 </div>

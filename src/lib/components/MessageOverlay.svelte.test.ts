@@ -79,6 +79,27 @@ describe("MessageOverlay", () => {
 		expect(game.donutMisses).toBe(0);
 	});
 
+	it("shows the credits and about link on the title and pause screens", () => {
+		for (const status of ["ready", "paused"] as const) {
+			game.status = status;
+			const { unmount } = render(MessageOverlay);
+			expect(screen.getByText(/Made by Kevin Peckham/)).toBeInTheDocument();
+			expect(
+				screen.getByRole("link", { name: "Lightning Jar" }),
+			).toHaveAttribute("href", "https://www.lightningjar.com");
+			expect(
+				screen.getByRole("link", { name: "About this game" }),
+			).toHaveAttribute("href", "/about");
+			unmount();
+		}
+	});
+
+	it("hides the credits on the game-over screen", () => {
+		game.status = "over";
+		render(MessageOverlay);
+		expect(screen.queryByText(/Made by Kevin Peckham/)).not.toBeInTheDocument();
+	});
+
 	it("starts a fresh game at level 1 after winning", async () => {
 		const user = userEvent.setup();
 		game.status = "won";
