@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-07-13
+
+### Added
+- Credits footer on the title and pause screens: "Made by Kevin Peckham @ Lightning Jar in Philadelphia." with a link to lightningjar.com, plus an "About this game" link
+- About page (`/about`, prerendered): what the game is, how to play, credits, and links to the "Arcade Game with No Game Loop" blog post and the GitHub repo
+
 ## [0.3.0] - 2026-07-13
 
 ### Added
