@@ -9,6 +9,7 @@ play field.
 import { fade } from "svelte/transition";
 
 import Header from "$components/Header.svelte";
+import LevelBanner from "$components/LevelBanner.svelte";
 import MessageOverlay from "$components/MessageOverlay.svelte";
 import PlayField from "$components/PlayField.svelte";
 
@@ -64,6 +65,11 @@ function onresize() {
 	{/if}
 
 	<PlayField />
+
+	<!-- momentary level announcement -->
+	{#if game.levelBanner !== null}
+		<LevelBanner level={game.levelBanner} />
+	{/if}
 
 	<!-- message overlay -->
 	{#if game.status !== "playing"}

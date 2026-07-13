@@ -14,7 +14,7 @@ import Shooter from "$components/Shooter.svelte";
 import { game } from "$stores/game.svelte";
 
 const activeBullets = $derived(
-	game.bullets.filter((bullet) => bullet.status !== "spent"),
+	game.bullets.filter((bullet) => bullet.status === "fired"),
 );
 const activeDonuts = $derived(
 	game.donuts.filter((donut) => donut.status !== "spent"),

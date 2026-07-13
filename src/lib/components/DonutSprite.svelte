@@ -8,11 +8,7 @@ component only animates the fall and renders the current state.
 import { cubicIn } from "svelte/easing";
 import { Tween } from "svelte/motion";
 
-import {
-	donutMaxTravelDistance,
-	donutMaxTravelDuration,
-	donutSize,
-} from "$stores/viewport.svelte";
+import { donutMaxTravelDistance, donutSize } from "$stores/viewport.svelte";
 
 import type { Donut } from "$stores/game.svelte";
 
@@ -23,9 +19,12 @@ interface Props {
 }
 let { donut }: Props = $props();
 
-// falls from just below the header to the top of the ground
+// falls from just below the header to the top of the ground, at the speed
+// captured on the donut when it dropped (higher levels fall faster);
+// fallDuration never changes for a donut, so reading it once is intended
+// svelte-ignore state_referenced_locally
 const y = new Tween(HEADER_HEIGHT, {
-	duration: donutMaxTravelDuration(),
+	duration: donut.fallDuration,
 	easing: cubicIn,
 });
 

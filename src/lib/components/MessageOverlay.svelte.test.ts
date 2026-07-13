@@ -45,6 +45,15 @@ describe("MessageOverlay", () => {
 		).toBeInTheDocument();
 	});
 
+	it("shows 'You Win!' with a Play Again button when won", () => {
+		game.status = "won";
+		render(MessageOverlay);
+		expect(screen.getByText("You Win!")).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: /Play Again/ }),
+		).toBeInTheDocument();
+	});
+
 	it("starts a new game from the ready screen", async () => {
 		const user = userEvent.setup();
 		render(MessageOverlay);
@@ -68,5 +77,15 @@ describe("MessageOverlay", () => {
 		await user.click(screen.getByRole("button", { name: /New Game/ }));
 		expect(game.status).toBe("playing");
 		expect(game.donutMisses).toBe(0);
+	});
+
+	it("starts a fresh game at level 1 after winning", async () => {
+		const user = userEvent.setup();
+		game.status = "won";
+		game.level = 20;
+		render(MessageOverlay);
+		await user.click(screen.getByRole("button", { name: /Play Again/ }));
+		expect(game.status).toBe("playing");
+		expect(game.level).toBe(1);
 	});
 });

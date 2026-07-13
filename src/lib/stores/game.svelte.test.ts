@@ -17,10 +17,16 @@ import {
 } from "$stores/game.svelte";
 import { donutMaxTravelDuration, viewport } from "$stores/viewport.svelte";
 
+import { levelDropInterval } from "$utils/difficulty";
+
 import {
 	BULLET_FLIGHT_DURATION,
+	HITS_PER_LEVEL,
 	INITIAL_DROP_DELAY,
+	LEVEL_BANNER_DURATION,
+	LEVEL_SPEEDUP_FACTOR,
 	MAX_HEALTH,
+	MAX_LEVEL,
 	MAX_MISSES,
 	TIME_BEFORE_HIT_DONUT_DISAPPEARS,
 	TIME_BEFORE_HIT_DONUT_TURNS_TO_SMOKE,
@@ -38,6 +44,7 @@ beforeEach(() => {
 
 afterEach(() => {
 	vi.useRealTimers();
+	vi.restoreAllMocks();
 });
 
 describe("startNewGame", () => {
@@ -55,6 +62,7 @@ describe("startNewGame", () => {
 	});
 
 	it("drops the first donut after the initial delay, then on an interval", () => {
+		vi.spyOn(Math, "random").mockReturnValue(0.5); // neutralize drop jitter
 		startNewGame();
 		expect(game.donuts).toHaveLength(0);
 		vi.advanceTimersByTime(INITIAL_DROP_DELAY - 1);
@@ -146,7 +154,6 @@ describe("shoot", () => {
 		vi.advanceTimersByTime(BULLET_FLIGHT_DURATION - 1);
 		expect(game.donutHits).toBe(1);
 		expect(game.bullets[0].status).toBe("hit");
-		expect(game.bullets[0].color).toBe("red");
 
 		vi.advanceTimersByTime(
 			TIME_BEFORE_HIT_DONUT_TURNS_TO_SMOKE + TIME_BEFORE_HIT_DONUT_DISAPPEARS,
@@ -185,6 +192,93 @@ describe("shoot", () => {
 		vi.advanceTimersByTime(BULLET_FLIGHT_DURATION);
 		shoot();
 		expect(game.bullets).toHaveLength(1);
+	});
+});
+
+describe("levels", () => {
+	/** Land one hit on a freshly dropped donut and let the bullet arrive. */
+	function scoreOneHit(): void {
+		dropDonut();
+		const donut = game.donuts[game.donuts.length - 1];
+		viewport.pointerX = donut.x;
+		shoot();
+		vi.advanceTimersByTime(BULLET_FLIGHT_DURATION);
+	}
+
+	it("advances the level, announces it, and resumes dropping after enough hits", () => {
+		startNewGame();
+		game.donutHits = HITS_PER_LEVEL - 1;
+		scoreOneHit();
+		expect(game.donutHits).toBe(HITS_PER_LEVEL);
+		expect(game.level).toBe(2);
+		expect(game.levelBanner).toBe(2);
+		// the field is cleared while the banner is up
+		expect(game.donuts).toHaveLength(0);
+		vi.advanceTimersByTime(LEVEL_BANNER_DURATION);
+		expect(game.levelBanner).toBe(null);
+		// then dropping resumes at the new level
+		vi.advanceTimersByTime(INITIAL_DROP_DELAY);
+		expect(game.donuts).toHaveLength(1);
+	});
+
+	it("pausing during the level banner dismisses it", () => {
+		startNewGame();
+		game.donutHits = HITS_PER_LEVEL - 1;
+		scoreOneHit();
+		expect(game.levelBanner).toBe(2);
+		pauseGame();
+		expect(game.status).toBe("paused");
+		expect(game.levelBanner).toBe(null);
+		resumeGame();
+		vi.advanceTimersByTime(INITIAL_DROP_DELAY);
+		expect(game.level).toBe(2);
+		expect(game.donuts).toHaveLength(1);
+	});
+
+	it("donuts fall faster at higher levels", () => {
+		startNewGame();
+		game.level = 10;
+		dropDonut();
+		const donut = game.donuts[0];
+		expect(donut.fallDuration).toBeCloseTo(
+			donutMaxTravelDuration() * LEVEL_SPEEDUP_FACTOR ** 9,
+		);
+		// the miss timer matches the faster fall
+		vi.advanceTimersByTime(Math.ceil(donut.fallDuration));
+		expect(donut.status).toBe("missed");
+	});
+
+	it("drops come more frequently at higher levels", () => {
+		vi.spyOn(Math, "random").mockReturnValue(0.5); // neutralize drop jitter
+		startNewGame();
+		game.level = 10;
+		vi.advanceTimersByTime(INITIAL_DROP_DELAY);
+		expect(game.donuts).toHaveLength(1);
+		const interval = levelDropInterval(10);
+		expect(interval).toBeLessThan(TIME_BETWEEN_DONUTS);
+		vi.advanceTimersByTime(Math.ceil(interval));
+		expect(game.donuts).toHaveLength(2);
+	});
+
+	it("wins the game after completing the final level", () => {
+		startNewGame();
+		game.level = MAX_LEVEL;
+		game.donutHits = MAX_LEVEL * HITS_PER_LEVEL - 1;
+		scoreOneHit();
+		expect(game.status).toBe("won");
+		expect(game.level).toBe(MAX_LEVEL);
+		expect(game.levelBanner).toBe(null);
+		expect(game.donuts).toHaveLength(0);
+		// no more drops after winning
+		vi.advanceTimersByTime(TIME_BETWEEN_DONUTS * 3);
+		expect(game.donuts).toHaveLength(0);
+	});
+
+	it("starts a new game back at level 1", () => {
+		startNewGame();
+		game.level = 7;
+		startNewGame();
+		expect(game.level).toBe(1);
 	});
 });
 

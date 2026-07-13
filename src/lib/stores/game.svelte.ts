@@ -9,6 +9,7 @@ import {
 	viewport,
 } from "$stores/viewport.svelte";
 
+import { levelSpeedMultiplier, nextDropDelay } from "$utils/difficulty";
 import { getRandomInt } from "$utils/helpers";
 import { bulletInterceptDelay } from "$utils/intercept";
 import { playSound } from "$utils/sound";
@@ -16,16 +17,18 @@ import { playSound } from "$utils/sound";
 import {
 	BULLET_FLIGHT_DURATION,
 	HEADER_HEIGHT,
+	HITS_PER_LEVEL,
 	INITIAL_DROP_DELAY,
+	LEVEL_BANNER_DURATION,
 	MAX_HEALTH,
+	MAX_LEVEL,
 	MAX_MISSES,
 	TIME_BEFORE_HIT_DONUT_DISAPPEARS,
 	TIME_BEFORE_HIT_DONUT_TURNS_TO_SMOKE,
 	TIME_BEFORE_MISSED_DONUT_DISAPPEARS,
-	TIME_BETWEEN_DONUTS,
 } from "$settings/gameSettings";
 
-export type GameStatus = "ready" | "playing" | "paused" | "over";
+export type GameStatus = "ready" | "playing" | "paused" | "over" | "won";
 export type DonutStatus = "dropped" | "hit" | "missed" | "spent";
 export type BulletStatus = "fired" | "hit" | "spent";
 
@@ -38,6 +41,8 @@ export interface Donut {
 	opacity: number;
 	rotate: number;
 	droppedAt: number;
+	/** ms this donut takes to reach the ground, captured at drop time. */
+	fallDuration: number;
 }
 
 export interface Bullet {
@@ -51,6 +56,8 @@ export interface Bullet {
 export const game = $state({
 	status: "ready" as GameStatus,
 	level: 1,
+	/** Level number being announced between levels, or null. */
+	levelBanner: null as number | null,
 	health: MAX_HEALTH,
 	donuts: [] as Donut[],
 	bullets: [] as Bullet[],
@@ -62,7 +69,6 @@ export const game = $state({
 
 // Timers live outside reactive state: they are implementation detail, not UI
 // state, and must be clearable without reactive tracking.
-let dropInterval: ReturnType<typeof setInterval> | undefined;
 let pendingTimeouts: ReturnType<typeof setTimeout>[] = [];
 
 function schedule(callback: () => void, delay: number): void {
@@ -70,18 +76,23 @@ function schedule(callback: () => void, delay: number): void {
 }
 
 function clearAllTimers(): void {
-	if (dropInterval) clearInterval(dropInterval);
-	dropInterval = undefined;
 	for (const timeout of pendingTimeouts) clearTimeout(timeout);
 	pendingTimeouts = [];
 }
 
 function startDropping(): void {
-	// first donut after a short initial delay, then on the steady cadence
+	// first donut after a short initial delay, then on the level's cadence
 	schedule(() => {
 		dropDonut();
-		dropInterval = setInterval(dropDonut, TIME_BETWEEN_DONUTS);
+		scheduleNextDrop();
 	}, INITIAL_DROP_DELAY);
+}
+
+function scheduleNextDrop(): void {
+	schedule(() => {
+		dropDonut();
+		scheduleNextDrop();
+	}, nextDropDelay(game.level));
 }
 
 /** Drop a new donut from a random x position. */
@@ -91,15 +102,16 @@ export function dropDonut(): void {
 		x: getRandomInt(0, Math.max(0, viewport.width - donutSize())),
 		status: "dropped",
 		content: "🍩",
-		label: String(game.donutCount),
+		label: "",
 		opacity: 1,
 		rotate: 0,
 		droppedAt: Date.now(),
+		fallDuration: donutMaxTravelDuration() * levelSpeedMultiplier(game.level),
 	};
 	game.donuts.push(donut);
 	game.donutCount++;
 	// a donut not shot before it reaches the ground counts as a miss
-	schedule(() => missDonut(donut.id), donutMaxTravelDuration());
+	schedule(() => missDonut(donut.id), donut.fallDuration);
 }
 
 function missDonut(id: number): void {
@@ -124,7 +136,7 @@ function hitDonut(donut: Donut, bullet: Bullet): void {
 	const delay = bulletInterceptDelay({
 		donutElapsed: Date.now() - donut.droppedAt,
 		donutTravelDistance: donutMaxTravelDistance(),
-		donutTravelDuration: donutMaxTravelDuration(),
+		donutTravelDuration: donut.fallDuration,
 		donutSize: donutSize(),
 		headerHeight: HEADER_HEIGHT,
 		viewportHeight: viewport.height,
@@ -135,11 +147,9 @@ function hitDonut(donut: Donut, bullet: Bullet): void {
 		donut.opacity = 0.6;
 		donut.label = "";
 		game.donutHits++;
-		// skip the flash if the flight-end timer already spent the bullet
-		if (bullet.status === "fired") {
-			bullet.status = "hit";
-			bullet.color = "red";
-		}
+		// leaving "fired" unmounts the bullet — it disappears on impact
+		if (bullet.status === "fired") bullet.status = "hit";
+		if (game.donutHits % HITS_PER_LEVEL === 0) completeLevel();
 	}, delay);
 	schedule(() => {
 		donut.content = "💨";
@@ -182,6 +192,29 @@ export function shoot(): void {
 	if (target) hitDonut(target, bullet);
 }
 
+/** Level complete: win the game after the final level, otherwise announce
+ * the next level, then resume dropping at its faster cadence. */
+function completeLevel(): void {
+	if (game.level >= MAX_LEVEL) {
+		winGame();
+		return;
+	}
+	clearAllTimers();
+	clearBoard();
+	game.level++;
+	game.levelBanner = game.level;
+	schedule(() => {
+		game.levelBanner = null;
+		startDropping();
+	}, LEVEL_BANNER_DURATION);
+}
+
+function winGame(): void {
+	game.status = "won";
+	clearAllTimers();
+	clearBoard();
+}
+
 function clearBoard(): void {
 	game.donuts = [];
 	game.bullets = [];
@@ -193,6 +226,8 @@ function resetStats(): void {
 	game.donutMisses = 0;
 	game.shotCount = 0;
 	game.health = MAX_HEALTH;
+	game.level = 1;
+	game.levelBanner = null;
 }
 
 export function startNewGame(): void {
@@ -207,6 +242,7 @@ export function startNewGame(): void {
 export function pauseGame(): void {
 	if (game.status !== "playing") return;
 	game.status = "paused";
+	game.levelBanner = null;
 	clearAllTimers();
 	clearBoard();
 }

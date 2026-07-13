@@ -1,12 +1,14 @@
 <!--
 @component
 Full-screen overlay shown whenever the game is not actively playing:
-title screen, pause screen, and game-over screen, plus the start button.
+title screen, pause screen, game-over screen, and win screen, plus the
+start button.
 -->
 
 <script lang="ts">
 import { fade } from "svelte/transition";
 
+import Confetti from "$components/Confetti.svelte";
 import IconPlay from "$components/IconPlay.svelte";
 
 import { game, resumeGame, startNewGame } from "$stores/game.svelte";
@@ -16,7 +18,9 @@ const buttonLabel = $derived(
 		? "Continue"
 		: game.status === "over"
 			? "New Game"
-			: "Play",
+			: game.status === "won"
+				? "Play Again"
+				: "Play",
 );
 
 function onStartButtonMousedown(event: MouseEvent) {
@@ -30,11 +34,20 @@ function onStartButtonMousedown(event: MouseEvent) {
 	class="pointer-events-auto fixed z-20 grid h-screen w-screen grid-cols-1 place-items-center"
 	transition:fade
 >
+	{#if game.status === "won"}
+		<Confetti />
+	{/if}
+
 	<div class="h-auto w-full">
 		<!-- message -->
 		<div class="mb-8 flex justify-center text-center text-4xl text-white">
 			{#if game.status === "over"}
 				<div class="inline-block">Game Over.</div>
+			{:else if game.status === "won"}
+				<div class="grid w-full grid-cols-1 justify-center">
+					<div class="mb-6 text-[120px] leading-none">🏆</div>
+					<div>You Win!</div>
+				</div>
 			{:else if game.status === "ready"}
 				<div class="grid w-full grid-cols-1 justify-center pt-48">
 					<h1 class="mb-8">Donut Shooter</h1>
