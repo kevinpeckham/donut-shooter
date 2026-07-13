@@ -6,7 +6,6 @@ import { describe, expect, it, vi } from "vitest";
 // no real audio in tests
 vi.mock("$utils/sound", () => ({ playSound: vi.fn() }));
 
-import { AUTO_START_DELAY } from "$settings/gameSettings";
 import { game, resetGame } from "$stores/game.svelte";
 import { viewport } from "$stores/viewport.svelte";
 
@@ -61,13 +60,14 @@ describe("game page", () => {
 		expect(game.shotCount).toBe(1);
 	});
 
-	it("auto-starts the game from the title screen after a delay", () => {
+	it("stays on the title screen until Play is clicked", () => {
 		vi.useFakeTimers();
 		try {
 			render(Page);
 			expect(game.status).toBe("ready");
-			vi.advanceTimersByTime(AUTO_START_DELAY);
-			expect(game.status).toBe("playing");
+			// no auto-start: starting always requires the Play button
+			vi.advanceTimersByTime(10_000);
+			expect(game.status).toBe("ready");
 		} finally {
 			vi.useRealTimers();
 		}

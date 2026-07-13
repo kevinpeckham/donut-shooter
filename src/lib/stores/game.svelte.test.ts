@@ -19,6 +19,7 @@ import { donutMaxTravelDuration, viewport } from "$stores/viewport.svelte";
 
 import {
 	BULLET_FLIGHT_DURATION,
+	INITIAL_DROP_DELAY,
 	MAX_HEALTH,
 	MAX_MISSES,
 	TIME_BEFORE_HIT_DONUT_DISAPPEARS,
@@ -53,13 +54,17 @@ describe("startNewGame", () => {
 		expect(game.bullets).toHaveLength(0);
 	});
 
-	it("drops donuts on an interval", () => {
+	it("drops the first donut after the initial delay, then on an interval", () => {
 		startNewGame();
 		expect(game.donuts).toHaveLength(0);
-		vi.advanceTimersByTime(TIME_BETWEEN_DONUTS);
+		vi.advanceTimersByTime(INITIAL_DROP_DELAY - 1);
+		expect(game.donuts).toHaveLength(0);
+		vi.advanceTimersByTime(1);
 		expect(game.donuts).toHaveLength(1);
 		vi.advanceTimersByTime(TIME_BETWEEN_DONUTS);
 		expect(game.donuts).toHaveLength(2);
+		vi.advanceTimersByTime(TIME_BETWEEN_DONUTS);
+		expect(game.donuts).toHaveLength(3);
 	});
 });
 
@@ -211,7 +216,7 @@ describe("pause and resume", () => {
 		pauseGame();
 		resumeGame();
 		expect(game.status).toBe("playing");
-		vi.advanceTimersByTime(TIME_BETWEEN_DONUTS);
+		vi.advanceTimersByTime(INITIAL_DROP_DELAY);
 		expect(game.donuts).toHaveLength(1);
 	});
 });

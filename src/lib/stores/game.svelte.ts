@@ -16,6 +16,7 @@ import { playSound } from "$utils/sound";
 import {
 	BULLET_FLIGHT_DURATION,
 	HEADER_HEIGHT,
+	INITIAL_DROP_DELAY,
 	MAX_HEALTH,
 	MAX_MISSES,
 	TIME_BEFORE_HIT_DONUT_DISAPPEARS,
@@ -76,7 +77,11 @@ function clearAllTimers(): void {
 }
 
 function startDropping(): void {
-	dropInterval = setInterval(dropDonut, TIME_BETWEEN_DONUTS);
+	// first donut after a short initial delay, then on the steady cadence
+	schedule(() => {
+		dropDonut();
+		dropInterval = setInterval(dropDonut, TIME_BETWEEN_DONUTS);
+	}, INITIAL_DROP_DELAY);
 }
 
 /** Drop a new donut from a random x position. */

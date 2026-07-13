@@ -4,7 +4,7 @@ A small browser arcade game. Donuts rain from the sky — move the shooter with 
 
 ## How to Play
 
-- The game starts on its own a couple of seconds after the title screen appears
+- **Start**: click Play (or New Game) — the first donut drops after a short delay
 - **Move**: the shooter follows your mouse along the ground
 - **Shoot**: click anywhere, or press Space
 - **Pause**: press Escape, or use the pause button in the header

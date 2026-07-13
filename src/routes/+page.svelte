@@ -1,8 +1,8 @@
 <!--
 @component
 The game screen. Tracks window size and pointer position, routes input
-(mousedown or Space fires, Escape pauses, resizing pauses), auto-starts the
-game from the title screen, and renders the play field.
+(mousedown or Space fires, Escape pauses, resizing pauses), and renders the
+play field.
 -->
 
 <script lang="ts">
@@ -12,22 +12,12 @@ import Header from "$components/Header.svelte";
 import MessageOverlay from "$components/MessageOverlay.svelte";
 import PlayField from "$components/PlayField.svelte";
 
-import { game, pauseGame, shoot, startNewGame } from "$stores/game.svelte";
+import { game, pauseGame, shoot } from "$stores/game.svelte";
 import { viewport } from "$stores/viewport.svelte";
 
 import { clamp } from "$utils/helpers";
 
-import {
-	AUTO_START_DELAY,
-	GAME_BACKGROUND_COLOR,
-} from "$settings/gameSettings";
-
-// the game starts itself shortly after the title screen appears
-$effect(() => {
-	if (game.status !== "ready") return;
-	const timeout = setTimeout(startNewGame, AUTO_START_DELAY);
-	return () => clearTimeout(timeout);
-});
+import { GAME_BACKGROUND_COLOR } from "$settings/gameSettings";
 
 function onmousemove(event: MouseEvent) {
 	viewport.pointerX = clamp(Math.floor(event.x), 0, viewport.width);
