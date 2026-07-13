@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-07-13
+
+### Changed
+- Starting a game always requires clicking Play / New Game again — the auto-start-from-title-screen behavior shipped in 0.2.0 is removed (clarified requirement)
+- After starting, the first donut now drops after a 1.25s initial delay (`INITIAL_DROP_DELAY`) instead of waiting a full 3.2s drop interval
+
 ## [0.2.0] - 2026-07-13
 
 Rebranded from **Donut Hunter** to **Donut Shooter** (production domain: www.donutshooter.com); package and GitHub repo renamed **donut-hunter** → **donut-shooter**.
