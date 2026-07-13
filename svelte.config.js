@@ -1,31 +1,27 @@
-import adapter from '@sveltejs/adapter-auto';
-import preprocess from 'svelte-preprocess';
-import path from 'path';
+// vercel adapter
+import { default as vercel } from "@sveltejs/adapter-vercel";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	// Consult https://github.com/sveltejs/svelte-preprocess
-	// for more information about preprocessors
-	preprocess: [
-		preprocess({
-			postcss: true
-		})
-	],
+	// Use vitePreprocess for TypeScript support
+	preprocess: vitePreprocess(),
 	kit: {
-		adapter: adapter(),
+		adapter: vercel(),
 		alias: {
-			$atoms: path.resolve('./src/lib/components/atoms'),
-			$components: path.resolve('./src/lib/components'),
-			$functions: path.resolve('./src/lib/functions'),
-			$lib: path.resolve('./src/lib'),
-			$molecules: path.resolve('./src/lib/components/molecules'),
-			$organism: path.resolve('./src/lib/components/organisms'),
-			$settings: path.resolve('./src/lib/settings'),
-			$stores: path.resolve('./src/lib/stores'),
-			$types: path.resolve('./src/lib/types'),
-			$utils: path.resolve('./src/lib/utils')
-		}
-	}
+			$assets: "./src/lib/assets",
+			$components: "./src/lib/components",
+			$data: "./src/lib/data",
+			$settings: "./src/lib/settings",
+			$stores: "./src/lib/stores",
+			$types: "./src/lib/types",
+			$utils: "./src/lib/utils",
+		},
+	},
+	compilerOptions: {
+		discloseVersion: false,
+		runes: true,
+	},
 };
 
 export default config;

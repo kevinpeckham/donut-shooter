@@ -1,0 +1,29 @@
+version: "0.2"
+ignorePaths:
+  - /cspell.config.yaml
+  - package.json
+  - /node_modules/
+dictionaryDefinitions: []
+dictionaries: []
+allowCompoundWords: true
+patterns:
+  - name: acronym
+    pattern: /[A-Z]{3,}/
+  - name: url
+    pattern: /(?:https?:\/\/)?[a-z0-9-_./]+\.[a-z0-9-_./]{2,}/
+  - name: htmlSpecialCharacters
+    pattern: /&(?:[a-z]{2,});/
+  - name: imageFormats
+    pattern: /(?:(?:webp|avif|png|jpg|jpeg|svg|gif)s?(?![a-zA-Z0-9]))+/i
+  - name: audioFormats
+    pattern: /(?:(?:mp3|wav|ogg)s?)+/i
+ignoreRegExpList:
+  - imageFormats
+  - audioFormats
+  - htmlSpecialCharacters
+words:
+  - donut
+  - donuts
+  - Peckham
+  - sveltekit
+  - unocss

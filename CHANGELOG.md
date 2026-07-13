@@ -1,0 +1,28 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.0] - 2026-07-13
+
+Project revival. Renamed from **leo-game** to **donut-hunter**; the game itself is now titled **Donut Hunter**.
+
+### Changed
+- Migrated Svelte 3 → Svelte 5 (runes API throughout: `$state`, `$derived`, `$props`, `$effect`); SvelteKit 1 → 2; Vite 4 → 8; TypeScript 4 → 6
+- Replaced TailwindCSS + PostCSS + autoprefixer with UnoCSS (`presetWind3`, Tailwind-compatible utilities)
+- Replaced Prettier + ESLint with Biome for formatting and linting
+- Replaced Playwright scaffold with Vitest 4: node project for unit tests, jsdom + Testing Library for component tests
+- Switched package manager to Bun; deployment adapter to `@sveltejs/adapter-vercel`
+- Removed Pug — all components are plain Svelte templates now
+- Rewrote game logic into a central runes store (`src/lib/stores/game.svelte.ts`): donut dropping, shooting, hit/miss resolution, pause/resume/reset, and game over all live in one tested state machine instead of being spread across components and a dozen writable stores
+- Flattened the component tree (no more atoms/molecules directories)
+
+### Added
+- Unit and component test suite (46 tests) covering helpers, viewport math, the game state machine, header, overlay, and the game page
+- fallow for code-integrity checks (dead code, duplication, dependency audit)
+- cspell configuration, README, CHANGELOG, CLAUDE.md, and a real error page
+
+### Removed
+- Dead code from the prototype phase: `DonutDropper.svelte` (duplicated drop logic), empty `shooterFunctions.ts`, unused player/shot/position stores, starter-template images, and the debug yellow background flash on a missed donut
