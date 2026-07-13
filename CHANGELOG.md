@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-07-13
+
+### Added
+- Levels: every 10 hits (`HITS_PER_LEVEL`) completes a level — the field clears, a momentary "Level N" banner announces the next level, then donuts resume falling
+- Tetris-style difficulty ramp (`src/lib/utils/difficulty.ts`): each level shrinks donut fall duration and the average time between drops by `LEVEL_SPEEDUP_FACTOR` (0.95/level); drop timing gets ±25% random jitter (`DROP_INTERVAL_JITTER`)
+- Win state: completing level 20 (`MAX_LEVEL`) shows a "You Win!" screen with CSS confetti and a Play Again button (new `"won"` game status)
+
+### Changed
+- Bullets shrink as they climb (down to `BULLET_MIN_SCALE` at the top of the screen) and disappear the moment they hit a donut, replacing the brief red flash
+- Each donut now captures its own `fallDuration` at drop time; the sprite tween, miss timer, and bullet-intercept math all read from it
+- Donuts no longer show their id number below the sprite (dev leftover); the label element remains for the "huh?" miss flourish
+- The level counter resets on new game (it previously never did)
+
 ## [0.2.1] - 2026-07-13
 
 ### Changed
