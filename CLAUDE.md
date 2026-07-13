@@ -29,7 +29,7 @@ All game logic lives in two runes stores; components are presentational:
 - `src/lib/stores/game.svelte.ts` — the game state machine: status (ready/playing/paused/over), donuts, bullets, stats, and every transition (`startNewGame`, `pauseGame`, `resumeGame`, `resetGame`, `dropDonut`, `shoot`). Timers are module-level, outside reactive state.
 - `src/lib/stores/viewport.svelte.ts` — window size + pointer tracking and derived sizes (donut size, shooter size/position, fall distance/duration).
 - `src/lib/settings/gameSettings.ts` — all gameplay tuning constants (speeds, timings, sizes, rules, colors).
-- `src/routes/+page.svelte` — binds window size, routes input (mousedown → shoot, Escape → pause, window resize → pause), renders the field.
+- `src/routes/+page.svelte` — binds window size, routes input (mousedown/Space → shoot, Escape → pause, window resize → pause), auto-starts the game from the title screen, renders the field.
 - Sprites (`DonutSprite`, `BulletSprite`) animate with `Tween` from `svelte/motion`; state changes come from the store.
 
 **Stack**:

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Spacebar fires (one shot per press; held-key auto-repeat is ignored)
+- The game auto-starts from the title screen after a two-second delay (`AUTO_START_DELAY`) instead of waiting for the Play button
+
 ### Changed
 - Bullet hits now register at the moment the bullet visually reaches the donut (computed from the two rendered tween trajectories) instead of after a fixed 100ms delay; the donut's explosion sequence and the score tick start at contact. `BULLET_HIT_DELAY` is replaced by the intercept math in `src/lib/utils/intercept.ts`
 - Resizing the window pauses the game, clearing the field — donut timers and fall tweens both capture the viewport when they start, so a mid-flight resize would let the game state and the animation disagree

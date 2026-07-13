@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 // no real audio in tests
 vi.mock("$utils/sound", () => ({ playSound: vi.fn() }));
 
+import { AUTO_START_DELAY } from "$settings/gameSettings";
 import { game, resetGame } from "$stores/game.svelte";
 import { viewport } from "$stores/viewport.svelte";
 
@@ -48,6 +49,28 @@ describe("game page", () => {
 		game.status = "playing";
 		await fireEvent.mouseDown(window);
 		expect(game.shotCount).toBe(1);
+	});
+
+	it("fires a shot on Space while playing, once per press", async () => {
+		render(Page);
+		game.status = "playing";
+		await fireEvent.keyDown(window, { key: " " });
+		expect(game.shotCount).toBe(1);
+		// a held-down key auto-repeats; only the initial press fires
+		await fireEvent.keyDown(window, { key: " ", repeat: true });
+		expect(game.shotCount).toBe(1);
+	});
+
+	it("auto-starts the game from the title screen after a delay", () => {
+		vi.useFakeTimers();
+		try {
+			render(Page);
+			expect(game.status).toBe("ready");
+			vi.advanceTimersByTime(AUTO_START_DELAY);
+			expect(game.status).toBe("playing");
+		} finally {
+			vi.useRealTimers();
+		}
 	});
 
 	it("pauses on Escape while playing", async () => {

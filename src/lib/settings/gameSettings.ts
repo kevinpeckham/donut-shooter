@@ -9,6 +9,7 @@ export const DONUT_SIZE_FACTOR = 6;
 export const SHOOTER_SIZE_FACTOR = 1.5;
 
 // speed & timing
+export const AUTO_START_DELAY = 2000; // ms on the title screen before the game starts itself
 export const DONUT_FALL_SPEED = 0.5; // pixels per millisecond
 export const TIME_BETWEEN_DONUTS = 3200; // ms between donut drops
 export const TIME_BEFORE_HIT_DONUT_TURNS_TO_SMOKE = 200; // ms after the bullet connects
