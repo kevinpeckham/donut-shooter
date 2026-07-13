@@ -1,7 +1,7 @@
 {
 	"author": "Kevin Peckham",
 	"name": "donut-shooter",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Donut Shooter — a browser arcade game: shoot the falling donuts before they hit the ground",
 	"repository": {
 		"type": "git",
