@@ -8,6 +8,7 @@ A small browser arcade game. Donuts rain from the sky — move the shooter with 
 - **Shoot**: click anywhere
 - **Pause**: press Escape, or use the pause button in the header
 - **Reset**: use the reset button in the header
+- Resizing the window pauses the game (in-flight donuts are discarded)
 
 ## Stack
 

@@ -1,7 +1,7 @@
 <!--
 @component
 The game screen. Tracks window size and pointer position, routes input
-(mousedown fires, Escape pauses), and renders the play field.
+(mousedown fires, Escape pauses, resizing pauses), and renders the play field.
 -->
 
 <script lang="ts">
@@ -29,6 +29,12 @@ function onmousedown() {
 function onkeydown(event: KeyboardEvent) {
 	if (event.key === "Escape") pauseGame();
 }
+
+// donut timers and tweens both capture the viewport when they start, so a
+// mid-flight resize would desync them; pausing clears the field instead
+function onresize() {
+	pauseGame();
+}
 </script>
 
 <svelte:window
@@ -37,6 +43,7 @@ function onkeydown(event: KeyboardEvent) {
 	{onmousemove}
 	{onmousedown}
 	{onkeydown}
+	{onresize}
 />
 
 <div

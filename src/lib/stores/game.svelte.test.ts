@@ -19,10 +19,10 @@ import { donutMaxTravelDuration, viewport } from "$stores/viewport.svelte";
 
 import {
 	BULLET_FLIGHT_DURATION,
-	BULLET_HIT_DELAY,
 	MAX_HEALTH,
 	MAX_MISSES,
 	TIME_BEFORE_HIT_DONUT_DISAPPEARS,
+	TIME_BEFORE_HIT_DONUT_TURNS_TO_SMOKE,
 	TIME_BEFORE_MISSED_DONUT_DISAPPEARS,
 	TIME_BETWEEN_DONUTS,
 } from "$settings/gameSettings";
@@ -132,16 +132,35 @@ describe("shoot", () => {
 		const donut = game.donuts[0];
 		viewport.pointerX = donut.x;
 		shoot();
+		// the donut is claimed at fire time (hitscan)...
 		expect(donut.status).toBe("hit");
+		expect(game.donutHits).toBe(0);
 
-		// the hit registers when the bullet arrives
-		vi.advanceTimersByTime(BULLET_HIT_DELAY);
+		// ...but the hit registers when the bullet reaches it, some time
+		// within its flight
+		vi.advanceTimersByTime(BULLET_FLIGHT_DURATION - 1);
 		expect(game.donutHits).toBe(1);
 		expect(game.bullets[0].status).toBe("hit");
 		expect(game.bullets[0].color).toBe("red");
 
-		vi.advanceTimersByTime(TIME_BEFORE_HIT_DONUT_DISAPPEARS);
+		vi.advanceTimersByTime(
+			TIME_BEFORE_HIT_DONUT_TURNS_TO_SMOKE + TIME_BEFORE_HIT_DONUT_DISAPPEARS,
+		);
 		expect(donut.status).toBe("spent");
+	});
+
+	it("registers the hit sooner for a donut closer to the ground", () => {
+		startNewGame();
+		dropDonut();
+		// let the donut fall most of the way before shooting it
+		vi.advanceTimersByTime(donutMaxTravelDuration() * 0.75);
+		const donut = game.donuts[0];
+		viewport.pointerX = donut.x;
+		shoot();
+		// a fresh donut takes ~1/3 of the flight to reach; a low one is
+		// hit almost immediately
+		vi.advanceTimersByTime(BULLET_FLIGHT_DURATION / 4);
+		expect(game.donutHits).toBe(1);
 	});
 
 	it("does not hit a donut the bullet misses", () => {
@@ -151,7 +170,7 @@ describe("shoot", () => {
 		viewport.pointerX = donut.x > 500 ? 0 : 990;
 		shoot();
 		expect(donut.status).toBe("dropped");
-		vi.advanceTimersByTime(BULLET_HIT_DELAY);
+		vi.advanceTimersByTime(BULLET_FLIGHT_DURATION);
 		expect(game.donutHits).toBe(0);
 	});
 

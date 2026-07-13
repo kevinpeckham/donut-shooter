@@ -11,10 +11,9 @@ export const SHOOTER_SIZE_FACTOR = 1.5;
 // speed & timing
 export const DONUT_FALL_SPEED = 0.5; // pixels per millisecond
 export const TIME_BETWEEN_DONUTS = 3200; // ms between donut drops
-export const TIME_BEFORE_HIT_DONUT_TURNS_TO_SMOKE = 200; // ms
-export const TIME_BEFORE_HIT_DONUT_DISAPPEARS = 200; // ms
+export const TIME_BEFORE_HIT_DONUT_TURNS_TO_SMOKE = 200; // ms after the bullet connects
+export const TIME_BEFORE_HIT_DONUT_DISAPPEARS = 200; // ms after turning to smoke
 export const TIME_BEFORE_MISSED_DONUT_DISAPPEARS = 200; // ms
-export const BULLET_HIT_DELAY = 100; // ms between the shot and the hit registering
 export const BULLET_FLIGHT_DURATION = 300; // ms for a bullet to leave the screen
 
 // rules

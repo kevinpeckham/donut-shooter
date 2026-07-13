@@ -1,18 +1,21 @@
 // Central game state and logic (Svelte 5 runes).
 
 import {
+	donutMaxTravelDistance,
 	donutMaxTravelDuration,
 	donutSize,
+	shooterSize,
 	shooterX,
 	viewport,
 } from "$stores/viewport.svelte";
 
 import { getRandomInt } from "$utils/helpers";
+import { bulletInterceptDelay } from "$utils/intercept";
 import { playSound } from "$utils/sound";
 
 import {
 	BULLET_FLIGHT_DURATION,
-	BULLET_HIT_DELAY,
+	HEADER_HEIGHT,
 	MAX_HEALTH,
 	MAX_MISSES,
 	TIME_BEFORE_HIT_DONUT_DISAPPEARS,
@@ -33,6 +36,7 @@ export interface Donut {
 	label: string;
 	opacity: number;
 	rotate: number;
+	droppedAt: number;
 }
 
 export interface Bullet {
@@ -85,6 +89,7 @@ export function dropDonut(): void {
 		label: String(game.donutCount),
 		opacity: 1,
 		rotate: 0,
+		droppedAt: Date.now(),
 	};
 	game.donuts.push(donut);
 	game.donutCount++;
@@ -108,22 +113,41 @@ function missDonut(id: number): void {
 }
 
 function hitDonut(donut: Donut, bullet: Bullet): void {
+	// claim the donut immediately (hitscan) so the miss timer cannot also
+	// fire for it; the visible reaction waits until the bullet gets there
 	donut.status = "hit";
-	donut.opacity = 0.6;
-	donut.label = "";
+	const delay = bulletInterceptDelay({
+		donutElapsed: Date.now() - donut.droppedAt,
+		donutTravelDistance: donutMaxTravelDistance(),
+		donutTravelDuration: donutMaxTravelDuration(),
+		donutSize: donutSize(),
+		headerHeight: HEADER_HEIGHT,
+		viewportHeight: viewport.height,
+		shooterSize: shooterSize(),
+		bulletFlightDuration: BULLET_FLIGHT_DURATION,
+	});
+	schedule(() => {
+		donut.opacity = 0.6;
+		donut.label = "";
+		game.donutHits++;
+		// skip the flash if the flight-end timer already spent the bullet
+		if (bullet.status === "fired") {
+			bullet.status = "hit";
+			bullet.color = "red";
+		}
+	}, delay);
 	schedule(() => {
 		donut.content = "💨";
 		donut.rotate = -90;
-	}, TIME_BEFORE_HIT_DONUT_TURNS_TO_SMOKE);
-	schedule(() => {
-		donut.status = "spent";
-	}, TIME_BEFORE_HIT_DONUT_DISAPPEARS);
-	// the hit registers shortly after the shot, when the bullet arrives
-	schedule(() => {
-		bullet.status = "hit";
-		bullet.color = "red";
-		game.donutHits++;
-	}, BULLET_HIT_DELAY);
+	}, delay + TIME_BEFORE_HIT_DONUT_TURNS_TO_SMOKE);
+	schedule(
+		() => {
+			donut.status = "spent";
+		},
+		delay +
+			TIME_BEFORE_HIT_DONUT_TURNS_TO_SMOKE +
+			TIME_BEFORE_HIT_DONUT_DISAPPEARS,
+	);
 }
 
 /** Fire a bullet from the shooter's current position. */

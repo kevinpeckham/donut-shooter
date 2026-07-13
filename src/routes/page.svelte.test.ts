@@ -56,4 +56,11 @@ describe("game page", () => {
 		await fireEvent.keyDown(window, { key: "Escape" });
 		expect(game.status).toBe("paused");
 	});
+
+	it("pauses when the window is resized while playing", async () => {
+		render(Page);
+		game.status = "playing";
+		await fireEvent(window, new Event("resize"));
+		expect(game.status).toBe("paused");
+	});
 });

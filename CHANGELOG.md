@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- Bullet hits now register at the moment the bullet visually reaches the donut (computed from the two rendered tween trajectories) instead of after a fixed 100ms delay; the donut's explosion sequence and the score tick start at contact. `BULLET_HIT_DELAY` is replaced by the intercept math in `src/lib/utils/intercept.ts`
+- Resizing the window pauses the game, clearing the field — donut timers and fall tweens both capture the viewport when they start, so a mid-flight resize would let the game state and the animation disagree
+
 ## [0.1.0] - 2026-07-13
 
 Project revival. Renamed from **leo-game** to **donut-hunter**; the game itself is now titled **Donut Hunter**.
