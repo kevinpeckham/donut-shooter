@@ -1,11 +1,11 @@
 {
 	"author": "Kevin Peckham",
-	"name": "donut-hunter",
+	"name": "donut-shooter",
 	"version": "0.1.0",
-	"description": "Donut Hunter — a browser arcade game: shoot the falling donuts before they hit the ground",
+	"description": "Donut Shooter — a browser arcade game: shoot the falling donuts before they hit the ground",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/kevinpeckham/donut-hunter"
+		"url": "https://github.com/kevinpeckham/donut-shooter"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.1",

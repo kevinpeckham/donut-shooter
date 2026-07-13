@@ -16,11 +16,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Donut Hunter (donut-hunter) is a small browser arcade game: donuts rain from the top of the screen and the player moves a shooter along the ground with the mouse, clicking to shoot donuts before they land. Three missed donuts ends the game.
+Donut Shooter (donut-shooter) is a small browser arcade game: donuts rain from the top of the screen and the player moves a shooter along the ground with the mouse, clicking to shoot donuts before they land. Three missed donuts ends the game.
 
 **Branding**:
-- Product name: "Donut Hunter" (used in the UI)
-- Technical name: "donut-hunter" (package.json, GitHub repo, infrastructure)
+- Product name: "Donut Shooter" (used in the UI)
+- Technical name: "donut-shooter" (package.json, GitHub repo, infrastructure)
+- Production domain: www.donutshooter.com
 
 ## Architecture
 

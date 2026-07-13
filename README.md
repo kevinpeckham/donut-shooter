@@ -1,4 +1,4 @@
-# Donut Hunter
+# Donut Shooter
 
 A small browser arcade game. Donuts rain from the sky — move the shooter with your mouse and click to shoot them down before they hit the ground. Miss three and it's game over. 🍩
 
@@ -47,4 +47,4 @@ Game logic is centralized in two runes stores; components are presentational:
 
 ## Deploy
 
-Deployed to Vercel via `@sveltejs/adapter-vercel`; the shell is prerendered.
+Deployed to Vercel via `@sveltejs/adapter-vercel`; the shell is prerendered. Production: [www.donutshooter.com](https://www.donutshooter.com).

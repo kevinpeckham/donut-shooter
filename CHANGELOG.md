@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Rebranded from **Donut Hunter** to **Donut Shooter** (production domain: www.donutshooter.com); package and GitHub repo renamed **donut-hunter** → **donut-shooter**.
+
 ### Added
 - Spacebar fires (one shot per press; held-key auto-repeat is ignored)
 - The game auto-starts from the title screen after a two-second delay (`AUTO_START_DELAY`) instead of waiting for the Play button

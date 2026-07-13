@@ -26,7 +26,7 @@ describe("game page", () => {
 	it("shows the title screen when ready", () => {
 		render(Page);
 		expect(
-			screen.getByRole("heading", { name: "Donut Hunter" }),
+			screen.getByRole("heading", { name: "Donut Shooter" }),
 		).toBeInTheDocument();
 	});
 

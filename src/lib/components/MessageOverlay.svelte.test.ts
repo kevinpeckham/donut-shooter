@@ -22,7 +22,7 @@ describe("MessageOverlay", () => {
 	it("shows the title screen when ready", () => {
 		render(MessageOverlay);
 		expect(
-			screen.getByRole("heading", { name: "Donut Hunter" }),
+			screen.getByRole("heading", { name: "Donut Shooter" }),
 		).toBeInTheDocument();
 		expect(screen.getByRole("button", { name: /Play/ })).toBeInTheDocument();
 	});

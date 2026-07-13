@@ -37,7 +37,7 @@ function onStartButtonMousedown(event: MouseEvent) {
 				<div class="inline-block">Game Over.</div>
 			{:else if game.status === "ready"}
 				<div class="grid w-full grid-cols-1 justify-center pt-48">
-					<h1 class="mb-8">Donut Hunter</h1>
+					<h1 class="mb-8">Donut Shooter</h1>
 					<div class="text-[200px] leading-none">🍩</div>
 				</div>
 			{:else if game.status === "paused"}
